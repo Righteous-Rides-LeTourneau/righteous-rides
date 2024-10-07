@@ -1,0 +1,45 @@
+.schedule {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: repeat(31, 1fr);
+}
+
+.corner {
+  width: 145px;
+  height: 60px;
+}
+
+.header-cell {
+  text-align: center;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc; /* Add border to show rows */
+  padding: 10px;
+}
+
+.van {
+  width: 100px;
+  font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #ccc; /* Add vertical line */
+}
+
+.rentals {
+  display: grid;
+  grid-template-columns: repeat(31, 1fr);
+  flex: 1;
+}
+

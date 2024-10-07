@@ -17,4 +17,18 @@ can use this tool because it would cost time and resources for training on this 
 **Software Description:** This software will take user information from Blackbaud for scheduling and asset allocation. The program will pair users with fleet vehicles using a GUI so that 
 when/if Cars Plus is no longer accessible, Righteous Rides employees will still have a method for pairing vehicles with customers. 
 
-**TODO:** Everything except this *very* comprehensive readme ;)
+**TODO:** Everything except this *very* comprehensive readme.
+
+## Developer Setup
+Install Node.js and npm 
+
+- Can check that npm is installed and in path by running `npm` in terminal
+
+Clone this repository
+
+Navigate to the root of the project and run `npm install` to install dependencies
+
+Once dependencies are installed:
+ - Run `npm run electron:serve` to locally run Electron app in development environment
+ - Run `npm run electron:build` to create a build and distribution of Electron app
+
