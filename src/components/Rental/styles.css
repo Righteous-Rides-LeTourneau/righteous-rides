@@ -1,0 +1,9 @@
+.rental {
+    cursor: move; /* Indicate draggable items */
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 2px;
+}
