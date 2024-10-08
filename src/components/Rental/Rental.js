@@ -11,6 +11,7 @@ const  Rental = ({ rental }) => {
     }),
   }));
 
+  //calculate time used for width
   const calculateDuration = (start, end) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
