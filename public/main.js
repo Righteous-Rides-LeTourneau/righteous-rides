@@ -1,41 +1,38 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'path';
-import isDev from 'electron-is-dev';
-import remoteMain from '@electron/remote/main/index.js';
-import { fileURLToPath } from 'url'
+import { app, BrowserWindow, ipcMain } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+import createAppWindow from "./app-process.js";
+import createAuthWindow from "./auth-process.js";
+import getPrivateData from "../src/auth/api-service.js";
 
-remoteMain.initialize();
-function createWindow() {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true
-    }
-  })
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  win.loadURL(
-    isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
-  );
-  win.setMenuBarVisibility(isDev);
+async function showWindow() {
+	try {
+		await refreshTokens();
+		createAppWindow();
+	} catch (err) {
+		createAuthWindow();
+	}
 }
 
-app.on('ready', createWindow)
+//remoteMain.initialize();
+
+app.on("ready", () => {
+	ipcMain.handle("api:get-private-data", getPrivateData);
+
+	showWindow();
+});
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
-  app.quit()
-})
+app.on("window-all-closed", () => {
+	app.quit();
+});
 
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow()
-})
+app.on("activate", function () {
+	// On OS X it's common to re-create a window in the app when the
+	// dock icon is clicked and there are no other windows open.
+	if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
