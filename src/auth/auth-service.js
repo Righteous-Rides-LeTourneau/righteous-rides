@@ -1,13 +1,17 @@
 import axios from "axios";
 import url from "url";
-
 import dotenv from "dotenv";
+import os from "os";
+import keytar from "keytar";
 
 dotenv.config();
 
 const CLIENT_ID = process.env.AUTH_CLIENT_ID;
 const CLIENT_SECRET = process.env.AUTH_CLIENT_SECRET;
 const AUTH_URL = process.env.AUTH_URL;
+
+const keytarService = 'rr-oauth';
+const keytarAccount = os.userInfo().username;
 
 const REDIRECT_URI = "https://localhost/callback";
 
@@ -34,18 +38,6 @@ async function loadTokens(callbackURL) {
 		redirect_uri: REDIRECT_URI,
 	};
 
-	const options = {
-		method: "POST",
-		url: `https://oauth2.sky.blackbaud.com/token`,
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-		data: JSON.stringify(exchangeOptions),
-	};
-
-	console.log("Exchange Options:", exchangeOptions);
-	console.log("Request Options:", options);
-
 	try {
 		const response = await axios.post(
 			"https://oauth2.sky.blackbaud.com/token",
@@ -58,52 +50,54 @@ async function loadTokens(callbackURL) {
 		);
 
 		accessToken = response.data.access_token;
-		// profile = jwtDecode(response.data.id_token);
 		refreshToken = response.data.refresh_token;
+
+		if(refreshToken) {
+			console.log("setting refresh token in keytar");
+			await keytar.setPassword(keytarService, keytarAccount, refreshToken);
+		}
 	} catch (error) {
 		throw error;
 	}
 }
 
-// async function refreshTokens() {
-//   const refreshToken = await keytar.getPassword(keytarService, keytarAccount);
+async function refreshForAccess() {
+  const currentRefreshToken = await keytar.getPassword(keytarService, keytarAccount);
 
-//   if (refreshToken) {
-//     const refreshOptions = {
-//       method: 'POST',
-//       url: `https://${auth0Domain}/oauth/token`,
-//       headers: {'content-type': 'application/json'},
-//       data: {
-//         grant_type: 'refresh_token',
-//         client_id: clientId,
-//         refresh_token: refreshToken,
-//       }
-//     };
+  if (currentRefreshToken) {
+	console.log("refresh token found");
+	console.log(currentRefreshToken);
+    const refreshOptions = {
+        grant_type: 'refresh_token',
+        client_id: CLIENT_ID,
+		client_secret: CLIENT_SECRET,
+        refresh_token: currentRefreshToken,
+    };
 
-//     try {
-//       const response = await axios(refreshOptions);
+    try {
+      const response = await axios.post('https://oauth2.sky.blackbaud.com/token', 
+		refreshOptions,
+		{
+			headers: {
+				"Content-Type": 'application/x-www-form-urlencoded',
+			},
+		}
+	  );
+	  console.log(response.data);
 
-//       accessToken = response.data.access_token;
-//       profile = jwtDecode(response.data.id_token);
-//     } catch (error) {
-//       await logout();
+      accessToken = response.data.access_token;
+	  refreshToken = response.data.refresh_token;
 
-//       throw error;
-//     }
-//   } else {
-//     throw new Error("No available refresh token.");
-//   }
-// }
+	  if(refreshToken) {
+		console.log("setting refresh token in keytar");
+		await keytar.setPassword(keytarService, keytarAccount, refreshToken);
+	  }
+    } catch (error) {
+      throw error;
+    }
+  } else {
+    throw new Error("No available refresh token.");
+  }
+}
 
-// async function logout() {
-//   await keytar.deletePassword(keytarService, keytarAccount);
-//   accessToken = null;
-//   profile = null;
-//   refreshToken = null;
-// }
-
-// function getLogOutUrl() {
-//   return `https://${auth0Domain}/v2/logout`;
-// }
-
-export { getAccessToken, getAuthenticationURL, loadTokens };
+export { getAccessToken, getAuthenticationURL, loadTokens, refreshForAccess };

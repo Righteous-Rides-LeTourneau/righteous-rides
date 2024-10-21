@@ -11,9 +11,7 @@ function createAppWindow() {
 		width: 1000,
 		height: 600,
 		webPreferences: {
-			nodeIntegration: false,
-			enableRemoteModule: true,
-			preload: path.join(__dirname, "preload.js"),
+			preload: path.join(__dirname, "./preload.js"),
 		},
 	});
 

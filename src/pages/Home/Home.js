@@ -47,6 +47,10 @@ const Home = () => {
 
   const dates = generateDates();
 
+  function apiCall() {
+    window.api.getPrivateData();
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="schedule">
@@ -63,6 +67,7 @@ const Home = () => {
           <VanRow key={index} van={van} rentals={rentals} moveRental={moveRental} />
         ))}
       </div>
+      <button onClick={apiCall}>API CALL</button>
     </DndProvider>
   );
 }

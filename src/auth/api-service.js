@@ -10,6 +10,7 @@ async function getPrivateData() {
 	// 	},
 	// });
 	console.log("API CALLED");
+	console.log(getAccessToken());
 	return "result";
 }
 
