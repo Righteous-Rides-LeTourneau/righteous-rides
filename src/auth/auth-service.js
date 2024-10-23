@@ -22,6 +22,11 @@ function getAccessToken() {
 	return accessToken;
 }
 
+async function setAccessTokenKeytar(newAccessToken) {
+	accessToken = newAccessToken;
+	await keytar.setPassword(keytarService, keytarAccount, refreshToken);
+}
+
 function getAuthenticationURL() {
 	return `${AUTH_URL}?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}`;
 }
@@ -49,24 +54,20 @@ async function loadTokens(callbackURL) {
 			}
 		);
 
-		accessToken = response.data.access_token;
 		refreshToken = response.data.refresh_token;
-
-		if(refreshToken) {
-			console.log("setting refresh token in keytar");
-			await keytar.setPassword(keytarService, keytarAccount, refreshToken);
-		}
+		await setAccessTokenKeytar(response.data.access_token);
 	} catch (error) {
 		throw error;
 	}
 }
 
 async function refreshForAccess() {
-  const currentRefreshToken = await keytar.getPassword(keytarService, keytarAccount);
-
-  if (currentRefreshToken) {
-	console.log("refresh token found");
-	console.log(currentRefreshToken);
+	const currentRefreshToken = await keytar.getPassword(keytarService, keytarAccount);
+	
+	if (!currentRefreshToken) {
+		throw new Error("No available refresh token.");
+	}
+	
     const refreshOptions = {
         grant_type: 'refresh_token',
         client_id: CLIENT_ID,
@@ -85,19 +86,12 @@ async function refreshForAccess() {
 	  );
 	  console.log(response.data);
 
-      accessToken = response.data.access_token;
 	  refreshToken = response.data.refresh_token;
+	  await setAccessTokenKeytar(response.data.access_token);
 
-	  if(refreshToken) {
-		console.log("setting refresh token in keytar");
-		await keytar.setPassword(keytarService, keytarAccount, refreshToken);
-	  }
     } catch (error) {
       throw error;
     }
-  } else {
-    throw new Error("No available refresh token.");
-  }
 }
 
 export { getAccessToken, getAuthenticationURL, loadTokens, refreshForAccess };

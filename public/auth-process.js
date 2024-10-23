@@ -13,9 +13,7 @@ function createAuthWindow() {
 
 	authWin.loadURL(getAuthenticationURL());
 
-	const {
-		session: { webRequest },
-	} = authWin.webContents;
+	const {session: { webRequest }} = authWin.webContents;
 
 	const filter = {
 		urls: ["https://localhost/callback*"],
