@@ -94,30 +94,32 @@ const Home = () => {
 
 	const dates = generateDates();
 
-	return (
-		<DndProvider backend={HTML5Backend}>
-			<div className="schedule">
-				<div className="topbar">
-					<div className="corner"></div>
-					<div className="header">
-						{dates.map((date, index) => (
-							<div key={index} className="header-cell">
-								{formatDate(date)}
-							</div>
-						))}
-					</div>
-				</div>
-				{vans.map((van, index) => (
-					<VanRow
-						key={index}
-						van={van}
-						rentals={rentals}
-						moveRental={moveRental}
-					/>
-				))}
-			</div>
-		</DndProvider>
-	);
-};
+
+  function apiCall() {
+    window.api.getPrivateData();
+  }
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div className="schedule">
+        <div className='topbar'>
+          <div className='corner'></div>
+          <div className="header">
+
+            {dates.map((date, index) => (
+              <div key={index} className="header-cell">{formatDate(date)}</div>
+            ))}
+          </div>
+        </div>
+        {vans.map((van, index) => (
+          <VanRow key={index} van={van} rentals={rentals} moveRental={moveRental} />
+        ))}
+      </div>
+      <button onClick={apiCall}>API CALL</button>
+    </DndProvider>
+  );
+}
+
+
 
 export default Home;
